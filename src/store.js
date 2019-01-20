@@ -137,6 +137,49 @@ function createOptimisticModule({
     };
 }
 
+var mDispatch = action => {
+    const id = getUid();
+    action.optimist = {
+        id,
+        type: 'BEGIN'
+    };
+    dispatch(action);
+};
+
+dispatch('UPDATE', [
+
+    // Normal action
+    ({dispatch}) => {
+        try {
+            await delay(3000);
+            dispatch({
+                type: 'UPDATE',
+                payload: {
+                    item: 'item_success'
+                }
+            });
+        }
+        catch (ex) {
+            commit({
+                type: 'UPDATE',
+                payload: {
+                    item: 'item_error'
+                }
+            });
+        }
+    },
+
+    // Optimistic action
+    ({commit}) => {
+        dispatch({
+            type: 'UPDATE',
+            payload: {
+                item: 'item_optimistic'
+            }
+        });
+    },
+]);
+
 const items = {
         state: {
             items: []
